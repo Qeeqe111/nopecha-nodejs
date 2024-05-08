@@ -1,6 +1,6 @@
 {
   "name": "nopecha",
-  "version": "1.0.8",
+  "version": "1.0.11",
   "description": "NopeCHA Node.js Library",
   "main": "nopecha.js",
   "scripts": {

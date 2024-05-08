@@ -46,6 +46,13 @@ class AuthenticationError extends NopeCHAError {
 }
 
 
+class UnavailableFeatureError extends NopeCHAError {
+    constructor(message) {
+        super(message);
+    }
+}
+
+
 class InsufficientCreditError extends NopeCHAError {
     constructor(message) {
         super(message);
@@ -132,20 +139,17 @@ class NopeCHAApi {
         const error_data = "message" in resp ? resp.message : resp.error;
         if (rcode === 429) {
             return new RateLimitError(error_data);
-        }
-        else if (rcode === 400) {
+        } else if (rcode === 400) {
             return new InvalidRequestError(error_data);
-        }
-        else if (rcode === 401) {
+        } else if (rcode === 401) {
             return new AuthenticationError(error_data);
-        }
-        else if (rcode === 403) {
+        } else if (rcode === 402) {
+            return new UnavailableFeatureError(error_data);
+        } else if (rcode === 403) {
             return new InsufficientCreditError(error_data);
-        }
-        else if (rcode === 409) {
+        } else if (rcode === 409) {
             return new IncompleteJobError(error_data);
-        }
-        else {
+        } else {
             return new UnknownError(error_data);
         }
     }
@@ -163,8 +167,7 @@ class NopeCHAApi {
             let response;
             if (status === 503) {
                 response = ServiceUnavailableError("The server is overloaded or not ready yet.");
-            }
-            else {
+            } else {
                 response = await r.json();
                 if ("error" in response) {
                     response = this.handle_error_response(status, response);
@@ -188,8 +191,7 @@ class NopeCHAApi {
         let response;
         if (status === 503) {
             response = ServiceUnavailableError("The server is overloaded or not ready yet.");
-        }
-        else {
+        } else {
             response = await r.json();
             if ("error" in response) {
                 response = this.handle_error_response(status, response);
@@ -228,8 +230,7 @@ class NopeCHAApi {
         let response;
         if (status === 503) {
             response = ServiceUnavailableError("The server is overloaded or not ready yet.");
-        }
-        else {
+        } else {
             response = await r.json();
             if ("error" in response) {
                 throw this.handle_error_response(status, response);
@@ -248,6 +249,7 @@ module.exports = {
     IncompleteJobError,
     RateLimitError,
     AuthenticationError,
+    UnavailableFeatureError,
     InsufficientCreditError,
     UnknownError,
     Timeout,
